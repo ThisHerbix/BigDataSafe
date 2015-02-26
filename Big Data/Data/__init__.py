@@ -21,5 +21,5 @@ auth = OAuthHandler(ckey, consumer_secret) #OAuth object
 auth.set_access_token(access_token_key, access_token_secret)
 
 
-twitterStream = Stream(auth, listener(start_time, time_limit=20)) #initialize Stream object with a time out limit
+twitterStream = Stream(auth, listener(start_time, time_limit=100000)) #initialize Stream object with a time out limit
 twitterStream.filter(track=keyword_list, languages=['en'])  #call the filter method to run the Stream Object

@@ -6,7 +6,7 @@ import json
 
 class listener(StreamListener):
 
-    def __init__(self, start_time, time_limit=60):
+    def __init__(self, start_time, time_limit= 100000):
 
         self.time = start_time
         self.limit = time_limit
@@ -19,6 +19,7 @@ class listener(StreamListener):
                 collection = db['twitter_collection']
                 tweet = json.loads(data)
                 collection.insert(tweet)
+                #print collection
                 
                 #saveFile = open('raw_tweets.json', 'a')
                 #saveFile.write(data)
