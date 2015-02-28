@@ -3,9 +3,10 @@ import pymongo
 from pymongo.collection import Collection
 import re
 from reportlab.graphics.barcode.eanbc import words
-from OneWordInfo import OneWordInfo
 import pickle
 
+MONGO_DATABASE_NAME = 'twitter_db2'
+MONGO_COLLECTION_NAME = 'twitter_collection2'
 
 #Cette fonction retourne le nombre de fois qu'un mot du sac de mot a ete rencontre.
 def TwtWhichContainOneWord(collection, searchedWord):
@@ -66,12 +67,26 @@ def OneTwtDictionnary(twt, dictionnary):
         else: 
             dictionnary[words[word]] = 1               
     return dictionnary
+def maxList(list):
+    return max(list)
  
-       
+def mostSaidWords(Occurencelist, wordlist, Nbmots):
+
+    print Occurencelist.index(max(Occurencelist))
+    print wordlist[Occurencelist.index(max(Occurencelist))]
+    print max(Occurencelist)
+    for i in range(1,Nbmots):
+        print i
+        indexOccurMax = Occurencelist.index(max(Occurencelist))
+        del Occurencelist[indexOccurMax]
+        del wordlist[indexOccurMax]
+        #print Occurencelist.index(max(Occurencelist))
+        print max(Occurencelist)
+        print wordlist[Occurencelist.index(max(Occurencelist))]
 
 client = MongoClient('localhost', 27017)
-db = client['twitter_db']
-collection = db['twitter_collection']
+db = client[MONGO_DATABASE_NAME ]
+collection = db[MONGO_COLLECTION_NAME]
 
 bagofword = ['football', 't', 'r','e', 'z']
 
@@ -89,10 +104,14 @@ bagofword = ['football', 't', 'r','e', 'z']
 a = dict()
 #a = OneTwtDictionnary('ok ok ok prout find test find test dans ta geule geule geule', a)
 a = LoadDictionnary(collection)
-#output = open('/home/alexis/Bureau/Text.file','wb')
-#pickle.dump(a, output)
-#output.close()
+output = open('/home/alexis/Bureau/Text.file','wb')
+pickle.dump(a, output)
+output.close()
 
-v = list(a.values())
-k = list(a.keys())
-print k[v.index(max(v))]
+v = list(a.values())    #nombre
+k = list(a.keys())      #mots
+mostSaidWords(v, k, 50)
+#print v.index(max(v))
+#print k[v.index(max(v))]
+del k[v.index(max(v))]
+
