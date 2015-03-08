@@ -4,7 +4,6 @@ from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import os
-from listener import listener
 import pymongo
 from pymongo import MongoClient
 from TwitterListener import TwitterListener
@@ -14,6 +13,7 @@ consumer_key = 'LLPdEoKpDy2eS0SH3Q51kTJLm'
 consumer_secret = '3tC736rpxgLAMr7DTCapNnCUPOHhWJVp9dcdfvDSzFVmiCD95R'
 access_token = '2917878929-jBWv0AZkEarot5z1XYLVManLBgGYAmZ8wZsMLZx'
 access_token_secret = 'EOJYh4SF5n2Q8zaK059Bfb8nKV7AjILXaqjFHIxRzcqYb'
+ 
  
  
 #start_time = time.time() #grabs the system time
