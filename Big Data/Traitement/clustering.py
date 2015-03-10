@@ -33,5 +33,4 @@ def plot_2D(data, target, target_names):
     pl.show()
 
 if __name__ == '__main__':
-    print 2
     c = clustering()
