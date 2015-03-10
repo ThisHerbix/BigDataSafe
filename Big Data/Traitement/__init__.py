@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from pymongo import MongoClient
 import pymongo
 from pymongo.collection import Collection
@@ -239,6 +239,8 @@ plt.pie(data2, explode=explode, labels=name2, autopct='%1.1f%%', shadow=True)
 plt.axis('equal')
 
 plt.subplot(213)
+plt.xlabel('Mots Analysés')
+plt.ylabel('Nombre d\'occurence')
 
 plt.show()
 
