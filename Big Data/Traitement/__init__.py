@@ -2,12 +2,12 @@ from pymongo import MongoClient
 import pymongo
 from pymongo.collection import Collection
 import re
-from reportlab.graphics.barcode.eanbc import words
 import pickle
-from _dbus_bindings import Double
 import math
 from cmath import log
 import copy
+import matplotlib
+import matplotlib.pyplot as plt
 
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
@@ -219,3 +219,22 @@ print hashtagoccu
 #print percentage(hashtagoccu)
 position = interestingPos(occurence, moyenne(occurence))
 #print interestingWords(words, position, 5)
+
+
+name = [words[0], words[1], words[2], words[3], words[4], words[5]]
+data = [occurence[0], occurence[1], occurence[2], occurence[3], occurence[4], occurence[5]]
+
+plt.figure(1)
+plt.subplot(211)
+explode=(0, 0, 0, 0, 0, 0)
+plt.pie(data, explode=explode, labels=name, autopct='%1.1f%%', shadow=True)
+plt.axis('equal')
+
+name2 = [hashtaglist[0], hashtaglist[1], hashtaglist[2], hashtaglist[3], hashtaglist[4], hashtaglist[5]]
+data2 = [hashtagoccu[0], hashtagoccu[1], hashtagoccu[2], hashtagoccu[3], hashtagoccu[4], hashtagoccu[5]]
+
+plt.subplot(212)
+plt.pie(data2, explode=explode, labels=name2, autopct='%1.1f%%', shadow=True)
+plt.axis('equal')
+plt.show()
+

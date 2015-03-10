@@ -58,6 +58,9 @@ def removeUselessData(data):
         del data['place']
     if data.has_key('filter_level'):
         del data['filter_level']
+    if data.has_key('metadata'):
+        del data['metadata']
+             
              
     return data
 
@@ -76,7 +79,7 @@ class TwitterListener(tweepy.StreamListener):
                 client = MongoClient('localhost', 27017)
                 db = client[MONGO_DATABASE_NAME ]
                 collection = db[MONGO_COLLECTION_NAME]
-                #Récupération d'un tweet en JSON    
+                #Récupération d'un tweet en JSON
                 tweet = json.loads(data)
                 #Suppression des informations inutiles
                 tweet = removeUselessData(tweet)
@@ -115,6 +118,11 @@ class TwitterListener(tweepy.StreamListener):
                                 tweet['user_activity'] = user_activity
                                 tweet['meaning_similarity'] = -1
                                 tweet['other_similarity'] = -1
+                                tweet['day'] = changeDate(tweet)[0]
+                                tweet['daynumber'] = changeDate(tweet)[2]
+                                tweet['month'] = changeDate(tweet)[1]
+                                tweet['year'] = changeDate(tweet)[5]
+                                tweet['horary'] = changeDate(tweet)[3]
                                 collection.insert(tweet)
                                
                                     
@@ -127,7 +135,6 @@ class TwitterListener(tweepy.StreamListener):
                 pass
         exit()
     
-
     def on_error(self, status):
         print status
 
@@ -145,7 +152,19 @@ def start_stream():
             twitterStream.filter(track=["android"])
         except:
             continue
-        
+
+def changeDateToHour(horary):
+    tmp = horary.split(":")
+    hour = tmp[0]
+    return hour        
+
+def changeDate(tweet):
+    created_at = tweet['created_at']
+    datetab = created_at.split()
+    datetab[3] = changeDateToHour(datetab[3])
+    return datetab
+    
+
 def OneTwtDictionnary(twt):
     dictionnary = {}
     words = twt.split()
@@ -175,6 +194,3 @@ def getOneTwtOccurrences(dictionnary):
     return dictionnary.values()
 
 start_stream()
-
-        
-        

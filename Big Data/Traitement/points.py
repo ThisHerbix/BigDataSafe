@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
 
@@ -7,31 +8,10 @@ client = MongoClient('localhost', 27017)
 db = client[MONGO_DATABASE_NAME ]
 collection = db[MONGO_COLLECTION_NAME]
 
-ABS_CENTER = 100
-ORD_CENTER = 200
+ABS_CENTER = 0                                        #Valeur de départ en abscisse
+ORD_CENTER = 0                                    #Valeur de départ en ordonnée
 
-x = [ 5.1,  4.9,  4.7,  4.6,  5.,   5.4,  4.6,  5.,   4.4,  4.9,  5.4,  4.8,  4.8,  4.3,  5.8,
-      5.7,  5.4,  5.1,  5.7,  5.1,  5.4,  5.1,  4.6,  5.1,  4.8,  5.,   5.,   5.2,  5.2,  4.7,
-      4.8,  5.4,  5.2,  5.5,  4.9,  5.,   5.5,  4.9,  4.4,  5.1,  5.,   4.5,  4.4,  5.,   5.1,
-      4.8,  5.1,  4.6,  5.3,  5.,   7.,   6.4,  6.9,  5.5,  6.5,  5.7,  6.3,  4.9,  6.6,  5.2,
-      5.,   5.9,  6.,   6.1,  5.6,  6.7,  5.6,  5.8,  6.2,  5.6,  5.9,  6.1,  6.3,  6.1,  6.4,
-      6.6,  6.8,  6.7,  6.,   5.7,  5.5,  5.5,  5.8,  6.,   5.4,  6.,   6.7,  6.3,  5.6,  5.5,
-      5.5,  6.1,  5.8,  5.,   5.6,  5.7,  5.7,  6.2,  5.1,  5.7,  6.3,  5.8,  7.1,  6.3,  6.5,
-      7.6,  4.9,  7.3,  6.7,  7.2,  6.5,  6.4,  6.8,  5.7,  5.8,  6.4,  6.5,  7.7,  7.7,  6.,
-      6.9,  5.6,  7.7,  6.3,  6.7,  7.2,  6.2,  6.1,  6.4,  7.2,  7.4,  7.9,  6.4,  6.3,  6.1,
-      7.7,  6.3,  6.4,  6.,   6.9,  6.7,  6.9,  5.8,  6.8,  6.7,  6.7,  6.3,  6.5,  6.2,  5.9 ]
-
-y = [ 3.5,  3.,   3.2,  3.1,  3.6,  3.9,  3.4,  3.4,  2.9,  3.1,  3.7,  3.4,  3.,   3.,   4.,
-      4.4,  3.9,  3.5,  3.8,  3.8,  3.4,  3.7,  3.6,  3.3,  3.4,  3.,   3.4,  3.5,  3.4,  3.2,
-      3.1,  3.4,  4.1,  4.2,  3.1,  3.2,  3.5,  3.1,  3.,   3.4,  3.5,  2.3,  3.2,  3.5,  3.8,
-      3.,   3.8,  3.2,  3.7,  3.3,  3.2,  3.2,  3.1,  2.3,  2.8,  2.8,  3.3,  2.4,  2.9,  2.7,
-      2.,   3.,   2.2,  2.9,  2.9,  3.1,  3.,   2.7,  2.2,  2.5,  3.2,  2.8,  2.5,  2.8,  2.9,
-      3.,   2.8,  3.,   2.9,  2.6,  2.4,  2.4,  2.7,  2.7,  3.,   3.4,  3.1,  2.3,  3.,   2.5,
-      2.6,  3.,   2.6,  2.3,  2.7,  3.,   2.9,  2.9,  2.5,  2.8,  3.3,  2.7,  3.,   2.9,  3.,
-      3.,   2.5,  2.9,  2.5,  3.6,  3.2,  2.7,  3.,   2.5,  2.8,  3.2,  3.,   3.8,  2.6,  2.2,
-      3.2,  2.8,  2.8,  2.7,  3.3,  3.2,  2.8,  3.,   2.8,  3.,   2.8,  3.8,  2.8,  2.8,  2.6,
-      3.,   3.4,  3.1,  3.,   3.1,  3.1,  3.1,  2.7,  3.2,  3.3,  3.,   2.5,  3.,   3.4,  3. ]
-
+#Fonction qui calcule une patie de la distance(meaning _similarity) en se basant sur la concordance des Hashtags
 def defineTwtHashTagDistanceValue():
     hashtaglist = []
     hashtagValue = []
@@ -39,8 +19,8 @@ def defineTwtHashTagDistanceValue():
         hashtaglist.append(tweets['hashtag'])
         identi = tweets['_id']
         collection.update({'_id': identi},{'$set': {'meaning_similarity': ABS_CENTER}})
+        hashtagValue.append(tweets['meaning_similarity'])
     for index in range(len(hashtaglist)):
-        hashtagValue.append(ABS_CENTER)
         if(index+1 <len(hashtaglist)):
             hashtagsactuel = hashtaglist[index]
             hashtagssuivant =  hashtaglist[index+1]
@@ -50,58 +30,145 @@ def defineTwtHashTagDistanceValue():
                         hashtagValue[index] = hashtagValue[index]-20
     for index, tweets in enumerate(collection.find()):
         identi = tweets['_id']
-        collection.update({'_id': identi},{'$set': {'meaning_similarity': hashtagValue[index]}})
-                   
+        collection.update({'_id': identi},{'$set': {'meaning_similarity': hashtagValue[index]}})     
     return hashtagValue
-
+#Fonction qui calcule une partie de la distance(meaning_similarity) en se basant sur la concordance de mot
 def defineTwtWordsDistanceValue():
     wordslist = []
     wordValue = []
     for tweets in collection.find():
         wordslist.append(tweets['words'])
         identi = tweets['_id']
-        collection.update({'_id': identi},{'$set': {'other_similarity': ORD_CENTER}})
+        wordValue.append(tweets['meaning_similarity'])
         
     for index in range(len(wordslist)):
-        wordValue.append(ORD_CENTER)
         if(index+1 <len(wordslist)):
             hashtagsactuel = wordslist[index]
             hashtagssuivant =  wordslist[index+1]
             for hashtag1 in hashtagsactuel:
                 for hashtag2 in hashtagssuivant:
                     if(hashtag1 == hashtag2):
-                                wordValue[index] = wordValue[index]-20
+                        wordValue[index] = wordValue[index]-20
+                    if(hashtag1 != hashtag2):
+                        wordValue[index] = wordValue[index]+20
     for index, tweets in enumerate(collection.find()):
         identi = tweets['_id']
-        collection.update({'_id': identi},{'$set': {'other_similarity': wordValue[index]}})
-                                
+        collection.update({'_id': identi},{'$set': {'meaning_similarity': wordValue[index]}})
     return wordValue
-        
-def giveHashtagValue(hashtaglist1, hashtaglist2):
-    for hashtag1 in hashtaglist1:
-        for hashtag2 in hashtaglist2:
-            if hashtag2.find(hashtag1):
-                print 'ok'
 
+#Fonction qui calcule une partie de la distance(other_similarity) en se basant sur la distance
+def defineGeoTwtDistance():
+    geolist = []
+    geoValue = []
+    for tweets in collection.find():
+        identi = tweets['_id']
+        if(tweets['geo'] == None):
+            collection.update({'_id': identi},{'$set': {'geo': 'missing'}})
+        geoValue.append(tweets['other_similarity'])
+        geolist.append(tweets['geo'])
+        
+    for index in range(len(geolist)):
+        if(index+1 <len(geolist)):
+            geoactuel = geolist[index]
+            geosuivant =  geolist[index+1]
+            if(geoactuel != 'missing'):
+                if(geosuivant != 'missing'):
+                    if(geoactuel == geosuivant):
+                        geoValue[index] = geoValue[index]-20
+                    else:
+                        geoValue[index] = geoValue[index]+20
+    for index, tweets in enumerate(collection.find()):
+        identi = tweets['_id']
+        collection.update({'_id': identi},{'$set': {'other_similarity': geoValue[index]}})
+    return geoValue
+#Fonction qui change la distance entre deux points en se basant sur la lang
+def defineLangTwtDistance():
+    langlist = []
+    langValue = []
+    for tweets in collection.find():
+        identi = tweets['_id']
+        if(tweets['lang'] == None):
+            collection.update({'_id': identi},{'$set': {'lang': 'missing'}})
+        langValue.append(tweets['other_similarity'])
+        langlist.append(tweets['lang'])
+        
+    for index in range(len(langlist)):
+        if(index+1 <len(langlist)):
+            langactuel = langlist[index]
+            langsuivant =  langlist[index+1]
+            if(langactuel != 'missing'):
+                if(langsuivant != 'missing'):
+                    if(langactuel == langsuivant):
+                            langValue[index] = langValue[index]-20
+                    if(langactuel != langsuivant):
+                            langValue[index] = langValue[index]+20
+    for index, tweets in enumerate(collection.find()):
+        identi = tweets['_id']
+        collection.update({'_id': identi},{'$set': {'other_similarity': langValue[index]}})
+    return langValue
+
+def defineUser_activityTwtDistance():
+    user_activitylist = []
+    user_activityValue = []
+    for tweets in collection.find():
+        identi = tweets['_id']
+        user_activityValue.append(tweets['other_similarity'])
+        user_activitylist.append(tweets['user_activity'])
+        
+    for index in range(len(user_activitylist)):
+        if(index+1 <len(user_activitylist)):
+            user_actuel = user_activitylist[index]
+            if(user_actuel <= 3):
+                user_activityValue[index] = user_activityValue[index]+5
+            if(user_actuel >= 5 and user_actuel <= 15):
+                user_activityValue[index] = user_activityValue[index]+10
+            if(user_actuel >=15 and user_actuel <= 30):
+                user_activityValue[index] = user_activityValue[index]+20
+            if(user_actuel >=15 and user_actuel <= 30):
+                user_activityValue[index] = user_activityValue[index]+50
+    for index, tweets in enumerate(collection.find()):
+        identi = tweets['_id']
+        collection.update({'_id': identi},{'$set': {'other_similarity': user_activityValue[index]}})
+    print user_activityValue
+    return user_activityValue
+
+#Fonction qui met les valeurs de similarité à leur valeur de base
+def setSimilarity(collection):
+    for tweets in collection.find():
+        identi = tweets['_id']
+        collection.update({'_id': identi},{'$set': {'meaning_similarity': ABS_CENTER}})
+        collection.update({'_id': identi},{'$set': {'other_similarity': ORD_CENTER}})
+
+#Fonction qui permet de convertir une donné depuis mongoDB en list        
 def dataMeaningtoList(collection, typeofmeaning):
     meaninglist = []
     for tweets in collection.find():
         meaninglist.append(tweets[typeofmeaning])
     return meaninglist
 
+#Fonction qui remet les valeurs de similarité à leur valeur de départ (0) et qui recalcule les similarités 
+def TestSimilarity(collection):
+    setSimilarity(collection)
+    defineTwtHashTagDistanceValue()
+    defineTwtWordsDistanceValue()
+    defineGeoTwtDistance()
+    defineLangTwtDistance()
+    defineUser_activityTwtDistance()
 
-defineTwtHashTagDistanceValue()
-defineTwtWordsDistanceValue()
+TestSimilarity(collection)
 
 plt.title('Nuage de points avec Matplotlib')
 plt.xlabel('sens')
 plt.ylabel('autres')
+x = []
+y = []
+x = dataMeaningtoList(collection, 'meaning_similarity')
+y = dataMeaningtoList(collection, 'other_similarity')
 
-plt.scatter(dataMeaningtoList(collection, 'meaning_similarity'),dataMeaningtoList(collection, 'other_similarity'))
+del x[-1]
+del y[-1]
+plt.scatter(x,  y)
+print x
+print y
 plt.savefig('ScatterPlot.png')
 plt.show()
-
-
-
-
-
