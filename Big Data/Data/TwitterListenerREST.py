@@ -4,10 +4,13 @@ import json
 from pymongo import MongoClient
 from tweepy import OAuthHandler
 import re
+#Module python utilisant l'API twitter(REST) pour récupérer des tweets
 
+#Nom de la base et de la collection MongoDB
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
 
+#Variable d'authentification auprès de twitter
 consumer_key = 'LLPdEoKpDy2eS0SH3Q51kTJLm'
 consumer_secret = '3tC736rpxgLAMr7DTCapNnCUPOHhWJVp9dcdfvDSzFVmiCD95R'
 access_token = '2917878929-jBWv0AZkEarot5z1XYLVManLBgGYAmZ8wZsMLZx'
@@ -63,7 +66,6 @@ def removeUselessData(data):
              
     return data
 
-
 def start_stream():
     while True:
         try:
@@ -74,16 +76,19 @@ def start_stream():
             api = tweepy.API(auth)
             
             #Obtention du flux
-            #twitterStream = Stream(auth, TwitterListener(start_time, time_limit=100000))
-            #twitterStream.filter(track=["android"])
-            
+
             for data in tweepy.Cursor(api.search, q='android', since='2014-01-01',until='2015-03-09').items(5000):
                 client = MongoClient('localhost', 27017)
+                #Connection à mongoDb
                 db = client[MONGO_DATABASE_NAME]
                 collection = db[MONGO_COLLECTION_NAME]
+                #Récupération d'un tweet en JSON
                 tweet2 = json.dumps(data._json)    
                 tweet = json.loads(tweet2)
+                #Suppression des informations inutiles
                 tweet = removeUselessData(tweet)
+                
+                #Transformation du tweet dans un format plus simple à traiter
                 if(tweet.has_key('lang')):
                     lang = tweet['lang']
                 if(tweet.has_key('text')):
@@ -103,24 +108,26 @@ def start_stream():
                     occurences = getOneTwtOccurrences(a)
                     hashtags = getHashtag(words, occurences)
                     
-                    
+                    #Mise en donnée évitant d'avoir plusieurs attributs différents.
                     if(tweet['retweeted'] == False):
                         tweet['retweeted'] = 0
                     if(tweet['favorited'] == False):
                         tweet['favorited'] = 0
                     if(tweet['geo'] == None):
                         tweet['geo'] = 0
+                        
                     tweet['text'] = text
                     tweet['words'] = words
                     tweet['nbwords'] = occurences
                     tweet['hashtag'] = hashtags
-                    tweet['neighbour'] = '-1'
+                    #tweet['neighbour'] = '-1'
                     user_activity = collection.find({'id' : identi}).count()+1
                     tweet['user_activity'] = user_activity
                     tweet['meaning_similarity'] = -1
                     tweet['other_similarity'] = -1
                     tweet['day'] = changeDate(tweet)[0]
                     
+                    #conversion des jours en donnée numérique
                     if(tweet['day'] == 'Mon'):
                         tweet['day'] = 1
                     if(tweet['day'] == 'Tue'):
@@ -135,11 +142,11 @@ def start_stream():
                         tweet['day'] = 6
                     if(tweet['day'] == 'Sun'):
                         tweet['day'] = 7
-                
-                    
+                                    
                     tweet['daynumber'] = changeDate(tweet)[2]
                     tweet['month'] = changeDate(tweet)[1]
-                    
+                                      
+                    #conversion des mois en donnée numérique
                     if(tweet['month'] == 'Jan'):
                         tweet['month'] = 1
                     if(tweet['month'] == 'Feb'):
@@ -164,29 +171,29 @@ def start_stream():
                         tweet['month'] = 11
                     if(tweet['month'] == 'Dec'):
                         tweet['month'] = 12
-                    
-                    
+                            
                     tweet['year'] = changeDate(tweet)[5]
                     tweet['horary'] = changeDate(tweet)[3]
+                    tweet['label'] = '-1'
                     collection.insert(tweet)
                     print tweet            
-                
-                    
-
         except:
             continue
-                
+
+#Fonction changeant le format fourni par twitter                
 def changeDateToHour(horary):
     tmp = horary.split(":")
     hour = tmp[0]
     return hour        
 
+#Fonction changeant le format de la date en un horaire
 def changeDate(tweet):
     created_at = tweet['created_at']
     datetab = created_at.split()
     datetab[3] = changeDateToHour(datetab[3])
     return datetab
-                
+
+#Fonction formant le dictionnaire lié à un tweet         
 def OneTwtDictionnary(twt):
     dictionnary = {}
     words = twt.split()
@@ -198,6 +205,7 @@ def OneTwtDictionnary(twt):
             dictionnary[words[word]] = 1               
     return dictionnary
 
+#Fonction récupérant les hashtags liés à un tweet
 def getHashtag(words, occurences):
     hashtaglist = []
     i = len(words)-1
@@ -208,10 +216,12 @@ def getHashtag(words, occurences):
             del words[i]
         i = i-1 
     return hashtaglist
-    
+
+#Fonction retournant les mots contenus dans le dictionnaire  
 def getOneTwtWords(dictionnary):
     return dictionnary.keys()
 
+#Fonction retournant les nombre d'ocurrence de chaque mot du dictionnaire
 def getOneTwtOccurrences(dictionnary):
     return dictionnary.values()
 

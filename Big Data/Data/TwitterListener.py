@@ -6,10 +6,13 @@ from tweepy import OAuthHandler
 from tweepy import Stream
 import re
 import time
+#Module python utilisant l'API twitter(stream) pour récupérer des tweets
 
+#Nom de la base et de la collection MongoDB
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
 
+#Variable d'authentification auprès de twitter
 consumer_key = 'LLPdEoKpDy2eS0SH3Q51kTJLm'
 consumer_secret = '3tC736rpxgLAMr7DTCapNnCUPOHhWJVp9dcdfvDSzFVmiCD95R'
 access_token = '2917878929-jBWv0AZkEarot5z1XYLVManLBgGYAmZ8wZsMLZx'
@@ -62,13 +65,11 @@ def removeUselessData(data):
         del data['metadata']
     if data.has_key('coordinates'):
         del data['coordinates']
-             
-             
+                         
     return data
 
 class TwitterListener(tweepy.StreamListener):
-    
-    
+      
     def __init__(self, start_time, time_limit= 100000):
 
         self.time = start_time
@@ -112,6 +113,7 @@ class TwitterListener(tweepy.StreamListener):
                                 occurences = getOneTwtOccurrences(a)
                                 hashtags = getHashtag(words, occurences)
                                 
+                                #Mise en donnée évitant d'avoir plusieurs attributs différents.
                                 if(tweet['retweeted'] == False):
                                     tweet['retweeted'] = 0
                                 if(tweet['favorited'] == False):
@@ -129,6 +131,7 @@ class TwitterListener(tweepy.StreamListener):
                                 tweet['other_similarity'] = -1
                                 tweet['day'] = changeDate(tweet)[0]
                                 
+                                #Conversion des jours en données numérique
                                 if(tweet['day'] == 'Mon'):
                                     tweet['day'] = 1
                                 if(tweet['day'] == 'Tue'):
@@ -148,6 +151,7 @@ class TwitterListener(tweepy.StreamListener):
                             
                                 tweet['month'] = changeDate(tweet)[1]
                                 
+                                #conversion des mois en donnée numérique
                                 if(tweet['month'] == 'Jan'):
                                     tweet['month'] = 1
                                 if(tweet['month'] == 'Feb'):
@@ -171,8 +175,7 @@ class TwitterListener(tweepy.StreamListener):
                                 if(tweet['month'] == 'Nov'):
                                     tweet['month'] = 11
                                 if(tweet['month'] == 'Dec'):
-                                    tweet['month'] = 12
-                                
+                                    tweet['month'] = 12                                
                                 
                                 tweet['year'] = changeDate(tweet)[5]
                                 tweet['horary'] = changeDate(tweet)[3]
@@ -206,18 +209,20 @@ def start_stream():
         except:
             continue
 
+#Fonction changeant le format fourni par twitter
 def changeDateToHour(horary):
     tmp = horary.split(":")
     hour = tmp[0]
     return hour        
 
+#Fonction changeant le format de la date en un horaire
 def changeDate(tweet):
     created_at = tweet['created_at']
     datetab = created_at.split()
     datetab[3] = changeDateToHour(datetab[3])
     return datetab
     
-
+#Fonction formant le dictionnaire lié à un tweet
 def OneTwtDictionnary(twt):
     dictionnary = {}
     words = twt.split()
@@ -229,6 +234,7 @@ def OneTwtDictionnary(twt):
             dictionnary[words[word]] = 1               
     return dictionnary
 
+#Fonction récupérant les hashtags liés à un tweet
 def getHashtag(words, occurences):
     hashtaglist = []
     i = len(words)-1
@@ -240,9 +246,12 @@ def getHashtag(words, occurences):
         i = i-1 
     return hashtaglist
     
+#Fonction retournant les mots contenus dans le dictionnaire
 def getOneTwtWords(dictionnary):
     return dictionnary.keys()
 
+
+#Fonction retournant les nombre d'ocurrence de chaque mot du dictionnaire
 def getOneTwtOccurrences(dictionnary):
     return dictionnary.values()
 

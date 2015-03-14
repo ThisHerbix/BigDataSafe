@@ -107,7 +107,7 @@ def allIDF(occurences, words, nbdocs):
     
     return IDFlist
 
-    
+#Fonction pour calculer le pourcentage d'apparition d'un mot   
 def percentage(occurences):
     totaloccu = NbWords(occurences)
     percentlist = list(range(len(occurences)))
@@ -119,7 +119,7 @@ def percentage(occurences):
         print('ERREUR MATH DIVISION PAR 0')
     
     return percentlist
-    
+#Fonction qui calcule l'IDf d'un mot 
 def invDocFrequency(collection, searchedword):
     IDF = 0
     nombredocs = collection.find().count()
@@ -135,6 +135,7 @@ def invDocFrequency(collection, searchedword):
         print 'ERREUR MATH DIVISION PAR 0'
     return IDF
 
+#Fonction permettant de "nettoyer" la liste de donnée non voulue ( Ex: mots trop courts)
 def cleanLists(listoccu, listword, listidf):
     i = len(listoccu)-1
     hastaglist =[]
@@ -153,13 +154,15 @@ def cleanLists(listoccu, listword, listidf):
     print listoccu,listword,listidf,hastaglist,hastagoccu
     return listoccu,listword,listidf,hastaglist,hastagoccu
 
+#Fonction qui retourn le nombre d'élément d'une liste
 def NbWords(listoccu):
     return sum(listoccu) 
-
+#Fonction qui calcule la moyenne d'une nombre d'ocurence des mots
 def moyenne(listoccu):
     moyenne = sum(listoccu)/len(listoccu)
     return moyenne
 
+#Fonction qui donne la position de l'élément apparaissant un nombre de fois "moyen"
 def interestingPos(thislist,moyenne):
     i = 0
     while(i < len(thislist)):
@@ -167,33 +170,36 @@ def interestingPos(thislist,moyenne):
             return i-1       
         i = i+1   
     return i
-  
+#Liste renvoyant les mots "intéressants" ni trop courts, ni apparraissant trop rarement "NON FINIE"
 def interestingWords(words, position,nbwords):
     interestwordlist = []
     i = position
     print 'position = '+str(position)
     for i in range(nbwords):
             if(position-i >= 0):
-                #print words[position-i]
-                #print position-i
+
                 interestwordlist.append(words[position-i])
      
     return interestwordlist
-  
+
+#On se connecte à la base MongoDB
 client = MongoClient('localhost', 27017)
 db = client[MONGO_DATABASE_NAME ]
 collection = db[MONGO_COLLECTION_NAME]
+#On compte le nombre de documents(tweets) dans la base
 nombredocs = collection.find().count()
 a = dict()
+#On charge le dictionnaire avec les mots et les occurences correspondantes
 a = LoadDictionnary(collection)
 output = open('/home/alexis/Bureau/Text.file','wb')
 
 occurence = list(a.values())    #nombre
 words = list(a.keys())          #mots
-
+#On trie les listes dans l'ordre croissant
 bubbleSortWordListOcurrenceList(occurence, words)
 IDF = allIDF(occurence, words, nombredocs)
- 
+
+#On nettoie la liste
 table = cleanLists(occurence, words, IDF)
 occurence = table[0]
 words = table[1]
@@ -201,30 +207,16 @@ IDF = table[2]
 hashtaglist = table[3]
 hashtagoccu = table[4]
 
+#On retrie
 bubbleSortWordListOcurrenceList(hashtagoccu, hashtaglist)
 
-print 'liste de mot :'
-print words
-print ''
-print 'liste de hashtag :'
-print hashtaglist
-print ''
-print 'liste des occurences :'
-print occurence
-#print 'liste de pourcentage (sur le nombre d\'occurence :'
-#print percentage(occurence)
-print ''
-print 'liste des occurences (sur les hashtags) :'
-print hashtagoccu
-#print 'liste de pourcentage(sur les hashtags) :'
-#print percentage(hashtagoccu)
 position = interestingPos(occurence, moyenne(occurence))
-#print interestingWords(words, position, 5)
 
 
 name = [words[0], words[1], words[2], words[3], words[4], words[5]]
 data = [occurence[0], occurence[1], occurence[2], occurence[3], occurence[4], occurence[5]]
 
+#On affiche ensuite des graphes correspondants aux données contenues dans notre base MongoDB
 plt.figure(1)
 plt.subplot(211)
 explode=(0, 0, 0, 0, 0, 0)
@@ -238,8 +230,8 @@ plt.subplot(212)
 plt.pie(data2, explode=explode, labels=name2, autopct='%1.1f%%', shadow=True)
 plt.axis('equal')
 
-plt.subplot(213)
-plt.xlabel('Mots Analysés')
+plt.subplot(212)
+plt.xlabel('Mots Analyses')
 plt.ylabel('Nombre d\'occurence')
 
 plt.show()
