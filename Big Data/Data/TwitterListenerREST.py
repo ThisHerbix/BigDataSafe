@@ -73,11 +73,11 @@ def start_stream():
             auth = OAuthHandler(consumer_key, consumer_secret)
             auth.set_access_token(access_token, access_token_secret)
             
-            api = tweepy.API(auth)
+            api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
             
             #Obtention du flux
 
-            for data in tweepy.Cursor(api.search, q='android', since='2014-01-01',until='2015-03-09').items(5000):
+            for data in tweepy.Cursor(api.search, q='android', count=100, result_type='recent', lang='en').items():
                 client = MongoClient('localhost', 27017)
                 #Connection à mongoDb
                 db = client[MONGO_DATABASE_NAME]
