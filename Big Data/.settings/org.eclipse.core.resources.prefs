@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+encoding//Data/FromMongoToFile.py=utf-8
+encoding//Data/TwitterListener.py=utf-8
+encoding//Data/TwitterListenerREST.py=utf-8
+encoding//Traitement/Kmean.py=utf-8
+encoding//Traitement/KmeanInfo.py=utf-8
+encoding//Traitement/KmeanText.py=utf-8
+encoding//Traitement/__init__.py=utf-8
+encoding//Traitement/points.py=utf-8
