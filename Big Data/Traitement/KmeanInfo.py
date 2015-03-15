@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from itertools import cycle
 from sklearn.decomposition import PCA
 from pymongo import MongoClient
@@ -6,10 +7,12 @@ from sklearn.cluster import KMeans
 import re
 import pylab as pl
 
+#Les informations pour se connecter à la base mongoDB et à la colection associée
 SEPARATOR = ' '
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
 
+#Fonction qui récupère les informations liées aux tweets, retournant une liste des textes des tweets par cluster
 def recup_cluster(collection):
     cluster0_list = []
     cluster1_list = []
@@ -25,7 +28,8 @@ def recup_cluster(collection):
             if(label == 2):
                 cluster2_list.append(a)
     return cluster0_list,cluster1_list,cluster2_list
-
+#Fonction qui charge un dictionnaire de type "key : value de fois que la key est apparu".
+#On utilisera cette fonction par la suite obtenir un dictionnaire pour chaque informations de chaque cluster
 def LoadDictionnary(cluster_list):
     dictionnary = {}
     for obj in cluster_list:
@@ -39,6 +43,7 @@ def LoadDictionnary(cluster_list):
                     dictionnary[words[word]] = 1   
     return dictionnary
 
+#On créée des liste contenants les informations d'un cluster
 def retrieveInfo(cluster_infotab):
     heure = []
     nbword = []
@@ -64,7 +69,8 @@ def retrieveInfo(cluster_infotab):
         favorited.append(tab[10])
         user_activity.append(tab[11])
     return nbword, nbhashtag, heure, day, daynumber,month,year,favorite_count,retweeted,favorited,user_activity
-def bubbleSortWordListOcurrenceList(occurencelist, wordlist):
+#Fonction pour trier des listes
+def SortWordListOcurrenceList(occurencelist, wordlist):
     n = len(occurencelist)
     swapped_elements = True
     while swapped_elements == True:
@@ -74,15 +80,16 @@ def bubbleSortWordListOcurrenceList(occurencelist, wordlist):
                 swapped_elements = True
                 occurencelist[j],occurencelist[j+1] = occurencelist[j+1],occurencelist[j]
                 wordlist[j],wordlist[j+1] = wordlist[j+1],wordlist[j]
+  
+#Fonction qui retourne deux listes servant à plot des graphes              
 def ToGraph(listx):
     dicti =  LoadDictionnary(listx)
     listvalue = list(dicti.keys())
     occurence = list(dicti.values())
-    bubbleSortWordListOcurrenceList(occurence, listvalue)
+    SortWordListOcurrenceList(occurence, listvalue)
     return occurence, listvalue
 
-
-
+#Fonction qui trace un graphe dans un espace 2D
 def plot_2D(data, target, target_names):
     colors = cycle('rgbcmykw')
     target_ids = range(len(target_names))
@@ -93,28 +100,27 @@ def plot_2D(data, target, target_names):
     pl.legend()
     pl.show()
 
+#On se connecte a MONgoDb et on utilise la collection associée
 client = MongoClient('localhost', 27017)
 db = client[MONGO_DATABASE_NAME]
 collection = db[MONGO_COLLECTION_NAME]
 
-#ouvrir le fichier de texte
+#ouvrir le fichier d'information
 with open("/home/alexis/Bureau/Info.file") as f:
     content = f.readlines()
-#with open("/home/alexis/Bureau/Text.file") as f:
-#    content2 = f.readlines()
- 
+
 #transformer le fichier texte en matrice numerique
 X = TfidfVectorizer().fit_transform(content)
 X = X.toarray()
 
-#MinibatchKmeans
-#Si vous voulez separer vos tweets en 3 classes:
 
+#On fait un essaie en separerant nos tweets en 3 classes:
 kmX = KMeans(n_clusters=3, max_iter=300).fit(X)
 
+#classes va contenir une liste avec les nombres 0, 1 ,2 qui identifient les 3 classes
+classes=kmX.labels_
 
-classes=kmX.labels_ #classes va contenir une liste avec les nombres 0, 1 ,2 qui identifient les 3 classes
-
+#On update les labels dans mongoDB
 for index, tweets in enumerate(collection.find()):
         if tweets:
             identi = tweets['_id']
@@ -124,11 +130,13 @@ pca = PCA(whiten=True).fit(X)
 X_pca = pca.transform(X)
 
 cluster = []
+#On récupère les informations de chaque tweet pour chaque cluster
 recupcluster = recup_cluster(collection)
 infocluster0 = [info.replace('\n', ' ') for info in recupcluster[0]]
 infocluster1 = [info.replace('\n', ' ') for info in recupcluster[1]]
 infocluster2 = [info.replace('\n', ' ') for info in recupcluster[2]]
 
+#On découpe ces information en liste
 infotab0 = [info.split(' ') for info in infocluster0]
 retrieve0 = retrieveInfo(infotab0)
 infotab1 = [info.split(' ') for info in infocluster1]
@@ -136,8 +144,7 @@ retrieve1 = retrieveInfo(infotab1)
 infotab2 = [info.split(' ') for info in infocluster2]
 retrieve2 = retrieveInfo(infotab2)
 
-#nbword, nbhashtag, heure, day, daynumber,month,year,favorite_count,retweeted,favorited,user_activity
-
+#Pour chaque cluster on récupère toutes les informations de manière à pouvoir ensuite les tracer dans un espace 2D
 #PREMIER CLUSTER
 
 nbwordsoccurence0  = ToGraph(retrieve0[0])[0]

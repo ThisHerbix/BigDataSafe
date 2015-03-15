@@ -69,7 +69,7 @@ def removeUselessData(data):
 def start_stream():
     while True:
         try:
-            #Authentification aupr��s de twitter
+            #Authentification auprès de twitter
             auth = OAuthHandler(consumer_key, consumer_secret)
             auth.set_access_token(access_token, access_token_secret)
             
