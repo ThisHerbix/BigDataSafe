@@ -12,8 +12,8 @@ SEPARATOR = ' '
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
 #Nom des fichiers
-NOM_FICHIER_TEXT = '/home/alexis/Bureau/Text.file'
-NOM_FICHIER_INFO = '/home/alexis/Bureau/Info.file'
+NOM_FICHIER_TEXT = '/Users/K2/Desktop/Text.file'
+NOM_FICHIER_INFO = '/Users/K2/Desktop/Info.file'
 
 #Function pour écrire dans un fichier depuis une base MongoDB
 def WriteCSVFileFromMongo(collection):

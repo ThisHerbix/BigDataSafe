@@ -77,7 +77,7 @@ def start_stream():
             
             #Obtention du flux
 
-            for data in tweepy.Cursor(api.search, q='android', count=100, result_type='popular', lang='en').items():
+            for data in tweepy.Cursor(api.search, q='android', count=100, result_type='recent', lang='en').items():
                 client = MongoClient('localhost', 27017)
                 #Connection à mongoDb
                 db = client[MONGO_DATABASE_NAME]

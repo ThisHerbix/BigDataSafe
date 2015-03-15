@@ -3,12 +3,14 @@ from sklearn.decomposition import PCA
 from pymongo import MongoClient
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 import re
 
 import pylab as pl
 
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
+PATH = '/Users/K2/Desktop/'
 
 def recup_cluster(collection):
     cluster0_list = []
@@ -24,6 +26,15 @@ def recup_cluster(collection):
             if(label == 2):
                 cluster2_list.append(obj['text'])
     return cluster0_list,cluster1_list,cluster2_list
+
+def LoadCluster(word, occurence):
+    name = []
+    data = []
+    for i in range(0, 5):
+        name.append(word[i])
+        data.append(occurence[i])
+    return name, data
+        
 
 def LoadDictionnary(cluster_list):
     dictionnary = {}
@@ -64,7 +75,7 @@ db = client[MONGO_DATABASE_NAME]
 collection = db[MONGO_COLLECTION_NAME]
 
 #ouvrir le fichier de texte
-with open("/home/alexis/Bureau/Text.file") as ftext:
+with open("/Users/K2/Desktop/Text.file") as ftext:
     contentext = ftext.readlines()
 #with open("/home/alexis/Bureau/Text.file") as f:
 #    content2 = f.readlines()
@@ -110,8 +121,36 @@ print occurence1
 print words1
 print occurence2
 print words2
+
 plot_2D(X_pca, classes, ["c0", "c1","c2"])
 
+
+
+cluster=LoadCluster(words1, occurence1)
+
+plt.figure(1)
+plt.pie(cluster[1], labels=cluster[0], autopct='%1.1f%%', shadow=True)
+plt.axis('equal')
+plt.figure(1).savefig(PATH+'C1_text.png') 
+
+
+cluster1=LoadCluster(words2, occurence2)
+
+plt.figure(2)
+plt.pie(cluster1[1], labels=cluster1[0], autopct='%1.1f%%', shadow=True)
+plt.axis('equal')
+plt.figure(1).savefig(PATH+'C2_text.png') 
+
+plt.figure(3)
+
+
+cluster2=LoadCluster(words0, occurence0)
+
+plt.pie(cluster2[1], labels=cluster2[0], autopct='%1.1f%%', shadow=True)
+plt.axis('equal')
+plt.figure(1).savefig(PATH+'C3_text.png') 
+
+plt.show()
 
 
 
