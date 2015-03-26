@@ -10,9 +10,9 @@ import pylab as pl
 #On importe les librairies
 
 #Les informations pour se connecter à la base mongoDB et à la colection associée
-MONGO_DATABASE_NAME = 'twitter_db3'
+MONGO_DATABASE_NAME = 'twitter'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
-PATH = '/Users/K2/Desktop/'
+PATH = '/home/alexis/Bureau/Images'
 
 #Fonction qui récupère le texte des tweets, retournant une liste des textes des tweets par cluster
 def recup_cluster(collection):
@@ -20,6 +20,7 @@ def recup_cluster(collection):
     cluster1_list = []
     cluster2_list = []
     for obj in collection.find({'label':{'$exists' : True}}):
+        print'recup'
         if obj:
             label = int(obj['label'])
             if(label == 0):
@@ -75,16 +76,19 @@ def plot_2D(data, target, target_names):
     pl.show()
 
 #On se connecte a MONgoDb et on utilise la collection associée
-client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://zaka:zaka@ds061767.mongolab.com:61767/twitter')
 db = client[MONGO_DATABASE_NAME]
 collection = db[MONGO_COLLECTION_NAME]
+print'ok'
 
 #ouvrir le fichier de texte
-with open("/Users/K2/Desktop/Text.file") as ftext:
+with open("/home/alexis/Bureau/Text.file") as ftext:
+    print'ok'
     contentext = ftext.readlines()
     print contentext
+    print 'merde'
 
- 
+print 'zboub'
 #transformer le fichier texte en matrice numerique
 X = TfidfVectorizer().fit_transform(contentext)
 X = X.toarray()
@@ -94,9 +98,11 @@ kmX = KMeans(n_clusters=3, max_iter=300).fit(X)
 
 #classes va contenir une liste avec les nombres 0, 1 ,2 qui identifient les 3 classes
 classes=kmX.labels_ 
+print'ok'
 
 #On update les labels dans mongoDB
 for index, tweets in enumerate(collection.find()):
+        print'connection'
         if tweets:
             identi = tweets['_id']
             collection.update({'_id': identi},{'$set': {'label': str(classes[index])}})
@@ -153,6 +159,5 @@ plt.axis('equal')
 plt.figure(1).savefig(PATH+'C3_text.png') 
 
 plt.show()
-
 
 

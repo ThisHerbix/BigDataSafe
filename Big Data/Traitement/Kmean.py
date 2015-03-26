@@ -14,7 +14,7 @@ import pylab as pl
 #Les informations pour se connecter à la base mongoDB et à la colection associée
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
-PATH = '/Users/K2/Desktop/'
+PATH = '/home/alexis/Bureau/Images'
 SEPARATOR = ' '
 
 #Fonction qui récupère le texte des tweets, retournant une liste des textes des tweets par cluster
@@ -147,14 +147,14 @@ db = client[MONGO_DATABASE_NAME]
 collection = db[MONGO_COLLECTION_NAME]
 
 #ouvrir le fichier de texte
-with open("/Users/K2/Desktop/Text.file") as ftext:
+with open("/home/alexis/Bureau/Text.file") as ftext:
     contentext = ftext.readlines()
 
 #transformer le fichier texte en matrice numerique
 X = TfidfVectorizer().fit_transform(contentext)
 X = X.toarray()
 
-with open("/Users/K2/Desktop/Info.file") as finfo:
+with open("/home/alexis/Bureau/Info.file") as finfo:
 
     contentinfo = finfo.readlines()
 Y = TfidfVectorizer().fit_transform(contentinfo)

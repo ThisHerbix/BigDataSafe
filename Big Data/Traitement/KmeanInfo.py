@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 SEPARATOR = ' '
 MONGO_DATABASE_NAME = 'twitter_db3'
 MONGO_COLLECTION_NAME = 'twitter_collection3'
-PATH = '/Users/K2/Desktop/'
+PATH = '/home/alexis/Bureau/Images'
 
 #Fonction qui récupère les informations liées aux tweets, retournant une liste des textes des tweets par cluster
 def recup_cluster(collection):
@@ -127,7 +127,7 @@ db = client[MONGO_DATABASE_NAME]
 collection = db[MONGO_COLLECTION_NAME]
 
 #ouvrir le fichier de texte
-with open("/Users/K2/Desktop/Info.file") as f:
+with open("/home/alexis/Bureau/Info.file") as f:
     content = f.readlines()
 
 #transformer le fichier texte en matrice numerique
